@@ -2,7 +2,6 @@ from flask import Flask
 import time
 import socket
 
-# Get Hostname and IP Address
 hostname = socket.gethostname()
 ip_address = socket.gethostbyname(hostname)
 
