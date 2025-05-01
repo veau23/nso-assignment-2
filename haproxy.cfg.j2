@@ -1,48 +1,125 @@
-- name: Configure local HAProxy and Flask app on macOS
-  hosts: localhost
-  connection: local
+hosts: all
   gather_facts: yes
+
+- name: Configuring HAproxy
+  hosts: HAproxy
+  become: yes
+  tasks:
+    - name: installing HAproxy
+      apt:
+        name: haproxy
+        update_cache: yes
+        state: latest
+
+    - name: HAproxy configuration for load balance
+      template:
+        src: haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+
+    - name: haproxy restart
+      service:
+        name: "haproxy"
+        state: restarted
+
+    - name: Installing Nginx for UDP services
+      apt:
+        name: nginx
+        update_cache: yes
+        state: latest
+
+    - name: Configuring the Nginx UDP port
+      template:
+        src: nginxport.conf
+        dest: /etc/nginx/sites-available/default
+
+    - name: Nginx configuration for UDP Load Balancing
+      template:
+        src: nginxudp.conf
+        dest: /etc/nginx/nginx.conf
+
+    - name: Restarting Nginx
+      service:
+        name: nginx
+        state: restarted
+
+- name: Web Server configuration
+  hosts: webservers
   become: yes
 
   tasks:
-    - name: Ensure Homebrew is installed
-      shell: |
-        which brew || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-      changed_when: false
+    - name: Update_the_packages
+      apt:
+        update_cache: yes
 
-    - name: Install HAProxy using Homebrew
-      homebrew:
-        name: haproxy
-        state: latest
+    - name: Installing NGINX and Flask packages
+      apt:
+        name: ['nginx', 'python3-flask']  
+        state: present
 
-    - name: Install Nginx using Homebrew
-      homebrew:
+
+    - name: install nginx
+      apt:
         name: nginx
         state: latest
 
-    - name: Install Python3 and pip3
-      homebrew:
-        name: python
+
+    - name: pip3 installation 
+      apt:
+        name: python3-pip
+        state: latest
+        update_cache: true
+
+    - name: Installing flask 
+      pip:
+        executable: pip3
+        name: flask
         state: latest
 
-    - name: Install Flask via pip3
-      pip:
-        name: flask
-        executable: pip3
+    - name: apt update
+      apt:
+        update_cache: true
 
-    - name: Install Gunicorn
+    - name: gunicorn installation 
       pip:
+        executable: pip3
         name: gunicorn
-        executable: pip3
+        state: latest
 
-    - name: Copy Flask application to local path
+    - name: apt update
+      apt:
+        update_cache: true
+    - name: copy flask app code 
       copy:
-        src: ./application2.py
-        dest: /usr/local/bin/application2.py
-        mode: '0755'
+        src: /$PWD/application2.py
+        dest: /home/ubuntu/application2.py
+        owner: ubuntu
+        mode: '0644'
 
-    - name: Start Flask application with Gunicorn
+    - name: Running Flask application #Execute the flask app
       shell: gunicorn -w 2 -D -b 0.0.0.0:5000 application2:app
-      args:
-        chdir: /usr/local/bin
 
+ name: Testing
+  hosts: HAproxy
+  become: yes
+
+  tasks:
+    - name: Testing the HAproxy load balancing 1st time.
+      shell: "curl localhost"
+      register: "output"
+      args:
+        warn: false
+    - debug: var=output.stdout
+
+    - name: Testing the HAproxy load balancing 2nd time.
+      shell: "curl localhost"
+      register: "output"
+      args:
+        warn: false
+    - debug: var=output.stdout
+
+    - name: Testing the HAproxy load balancing 3rd time.
+      shell: "curl localhost"
+      register: "output"
+      args:
+        warn: false
+    - debug: var=output.stdout
