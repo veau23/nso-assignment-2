@@ -1,4 +1,4 @@
-from flask import flask
+import flask
 import time
 import socket
 
@@ -13,6 +13,6 @@ def index():
     return f"{current_time} - Serving from {hostname} ({ip_address})\n"
 
 if _name_ == '_main_':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8000,debug=True)
     
 
