@@ -39,11 +39,12 @@
       apt:
         update_cache: yes
 
-    - name: Install required packages ( Flask, Pip)
+    - name: Install required packages ( Flask, Pip,venv)
       apt:
         name:
           - python3-flask
           - python3-pip
+          - python3-venv
         state: present
 
     - name: Install Flask via pip3
