@@ -2,17 +2,14 @@ import flask
 import time
 import socket
 
-hostname = socket.gethostname()
-ip_address = socket.gethostbyname(hostname)
+h_name = socket.gethostname()
+IP_addres = socket.gethostbyname(h_name)
 
-app = Flask(_name_)
+app = flask.Flask(__name__)
 
 @app.route('/')
 def index():
-    current_time = time.strftime("%H:%M:%S")
-    return f"{current_time} - Serving from {hostname} ({ip_address})\n"
-
-if _name_ == '_main_':
-    app.run(host='0.0.0.0', port=8000,debug=True)
+    Time= time.strftime("%H:%M:%S")
+    return Time+" Serving from "+h_name+" ("+IP_addres+")\n"
     
 
