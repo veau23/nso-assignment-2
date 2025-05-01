@@ -76,7 +76,7 @@
 
     - name: Copy Flask application code
       copy:
-        src: ./application2.py   # Ensure this file exists in your Ansible directory
+        src: ./application2.py   
         dest: /home/ubuntu/application2.py
         owner: ubuntu
         mode: '0644'
