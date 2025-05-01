@@ -36,15 +36,14 @@ timeout connect 5000
     errorfile 503 /etc/haproxy/errors/503.http
     errorfile 504 /etc/haproxy/errors/504.http
 
-frontend load_balancer
-	bind :80
-	default_backend web_servers
+frontend public
+    bind :80
+    mode http
+    default_backend nginx_web_servers
 
-backend web_servers
-	mode http
-	balance roundrobin
-{% for dev_servers in groups['webservers'] %}
-    server  {{ dev_servers }} {{ hostvars[dev_servers]["ansible_default_ipv4"]["address"]}}:8080
+backend nginx_web_servers
+{% for host in groups['webservers']%}
+  server  {{host}}{{ hostvars[host]['ansible_env'].SSH_CONNECTION.split('')[2]}}:80
 {% endfor %}
 
 listen stats
@@ -52,6 +51,3 @@ listen stats
     stats enable
     stats uri /monito
     stats refresh 5s
-
-
-
