@@ -11,11 +11,18 @@
         update_cache: yes
         state: latest
 
+    - name: Validate HAProxy configuration
+      command: haproxy -c -f /etc/haproxy/haproxy.cfg
+      register: haproxy_config_check
+      failed_when: haproxy_config_check.rc != 0
+      become: yes
+
     - name: Configure HAproxy load balancing
       template:
         src: haproxy.cfg.j2
         dest: /etc/haproxy/haproxy.cfg
         mode: '0644'
+      become: yes
 
     - name: Restart HAproxy
       service:
@@ -23,11 +30,14 @@
         state: restarted
         enabled: yes
         daemon_reload: yes
+      when: haproxy_config_check.rc == 0
+      become: yes
 
     - name: Install Nginx for UDP services
       apt:
         name: nginx
         state: latest
+      become: yes
 
     - name: Configure Nginx UDP port
       template:
@@ -35,6 +45,7 @@
         dest: /etc/nginx/sites-available/default
         mode: '0644'
         create: yes
+      become: yes
 
     - name: Configure Nginx for UDP load balancing
       template:
@@ -42,6 +53,7 @@
         dest: /etc/nginx/nginx.conf
         mode: '0644'
         create: yes
+      become: yes
 
     - name: Restart Nginx
       service:
@@ -49,30 +61,34 @@
         state: restarted
         enabled: yes
         daemon_reload: yes
+      become: yes
 
 - name: Web Server configuration
   hosts: webservers
   become: yes
-
   tasks:
     - name: Update package cache
       apt:
         update_cache: yes
+      become: yes
 
     - name: Install NGINX and Flask dependencies
       apt:
         name: ['nginx', 'python3-flask', 'python3-pip']
         state: present
+      become: yes
 
     - name: Install Flask via pip3
       pip:
         name: flask
         executable: pip3
+      become: yes
 
     - name: Install Gunicorn
       pip:
         name: gunicorn
         executable: pip3
+      become: yes
 
     - name: Copy Flask application code
       copy:
@@ -80,12 +96,10 @@
         dest: /home/ubuntu/application2.py
         owner: ubuntu
         mode: '0644'
+      become: yes
 
     - name: Run Flask app with Gunicorn
       shell: gunicorn -w 2 -D -b 0.0.0.0:5000 application2:app
       args:
         chdir: /home/ubuntu
-
-
-
-  
+      become: yes
