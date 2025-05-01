@@ -17,7 +17,7 @@
 
     - name: Configure haproxy
       template:
-        src: /$PWD/haproxy.cfg.j2
+        src: /haproxy.cfg.j2
         dest: /etc/haproxy/haproxy.cfg
  
     - name: Restart haproxy
@@ -53,7 +53,7 @@
 
     - name: Copy Application2.py
       copy:
-        src: /$PWD/application2.py
+        src: /application2.py
         dest: /home/ubuntu/application2.py
         owner: ubuntu
         mode: '0644'
