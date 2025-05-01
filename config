@@ -1,7 +1,7 @@
 PasswordAuthentication no
 StrictHostKeyChecking no
 
-Host Bastion
+Host bastionNSO
         HostName 89.46.83.62
         User ubuntu
         IdentityFile ~/.ssh/keypair
