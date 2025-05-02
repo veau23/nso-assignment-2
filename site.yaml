@@ -68,22 +68,21 @@
   become: yes
   tasks:
     - name: Test HAProxy - Round 1
-      shell: curl localhost
+      shell: curl {{ ansible_default_ipv4.address }}
       register: result1
     - debug:
         var: result1.stdout
       
     - name: Test HAProxy - Round 2
-      shell: curl localhost
+      shell: curl {{ ansible_default_ipv4.address }}
       register: result2
     - debug:
         var: result2.stdout
   
     - name: Test HAProxy - Round 3
-      shell: curl localhost
+      shell: curl {{ ansible_default_ipv4.address }}
       register: result3
     - debug:
         var: result3.stdout
 
-      
   
