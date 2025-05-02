@@ -19,7 +19,7 @@
         dest: /etc/haproxy/haproxy.cfg
 
     - name: Restart HAProxy service
-       service:
+      service:
         name: haproxy   
         state: restarted
         
