@@ -12,7 +12,7 @@ global
     ca-base /etc/ssl/certs
     crt-base /etc/ssl/private
 
-    ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA38$
+    ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:$
     ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
     ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
 
@@ -31,15 +31,18 @@ defaults
     errorfile 502 /etc/haproxy/errors/502.http
     errorfile 503 /etc/haproxy/errors/503.http
     errorfile 504 /etc/haproxy/errors/504.http
+
 frontend public
     bind *:80
     mode http
     default_backend web_servers
-    
+
 backend web_servers
     balance roundrobin
     mode http
     option forwardfor
-{% for host in groups['webservers'] %}
-    server {{ host }} {{ hostvars[host]['ansible_default_ipv4']['address'] }}:5000 check
+{% for instance in groups['webservers'] %}
+{% set ip_addr = hostvars[instance]['ansible_default_ipv4']['address'] %}
+    server {{ instance }} {{ ip_addr }}:5000 check
 {% endfor %}
+
