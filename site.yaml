@@ -62,4 +62,21 @@
       shell: gunicorn -w 2 -D -b 0.0.0.0:5000 application2:app
       args:
         chdir: /home/ubuntu
-    
+name: Testing HAProxy Load Balancing
+hosts: HAproxy
+become: yes
+  tasks:
+    - name: Test HAProxy 1st time
+      shell: curl localhost
+      register: output1
+    - debug: var=output1.stdout
+      
+    - name: Test HAProxy 2nd time
+      shell: curl localhost
+      register: output2
+    - debug: var=output2.stdout
+  
+    - name: Test HAProxy 3rd time
+      shell: curl localhost
+      register: output3
+    - debug: var=output3.stdout
