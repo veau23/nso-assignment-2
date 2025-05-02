@@ -4,23 +4,23 @@
   hosts: all
   gather_facts: yes
     
-- name: Configuring HAProxy
+- name: Configuring HAproxy
   hosts: HAproxy
   become: true
   become_method: sudo
   tasks:
-    - name: Install HAProxy
+    - name: Install HAproxy
       apt:
         name: haproxy
         update_cache: yes
         state: latest
     
-    - name: Configure HAProxy for load balancing
+    - name: Configure HAproxy for load balancing
       template:
         src: haproxy.cfg.j2
         dest: /etc/haproxy/haproxy.cfg
 
-    - name: Restart HAProxy service
+    - name: Restart HAproxy service
       service:
         name: haproxy
         state: restarted
@@ -63,24 +63,3 @@
       args:
         chdir: /home/ubuntu
     
-- name: Testing HAProxy Load Balancing
-  hosts: HAproxy
-  become: yes
-  tasks:
-    - name: Test HAProxy - Round 1
-      shell: curl localhost
-      register: result1
-    - debug:
-        var: result1.stdout
-        
-    - name: Test HAProxy - Round 2
-      shell: curl localhost
-      register: result2
-    - debug:
-        var: result2.stdout
-        
-    - name: Test HAProxy - Round 3
-      shell: curl localhost
-      register: result3
-    - debug:
-        var: result3.stdout
