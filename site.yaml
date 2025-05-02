@@ -9,7 +9,7 @@
   become_method: sudo
   tasks:
     - name: Install HAproxy
-      apt:
+      homebrew:
         name: haproxy
         update_cache: yes
         state: latest
@@ -30,10 +30,10 @@
   become_method: sudo
   tasks:     
     - name: Refresh apt cache
-      apt:
+      homebrew:
         update_cache: yes
     - name: Update package cache
-      apt:
+      homebrew:
         update_cache: yes
  - name: Install pip3
    apt:
