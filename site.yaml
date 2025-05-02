@@ -69,7 +69,7 @@
   tasks:
     - name: Test HAProxy 1st time
       shell: curl localhost
-register: output1
+      register: output1
     - debug: var=output1.stdout
       
     - name: Test HAProxy 2nd time
