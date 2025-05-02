@@ -65,7 +65,7 @@
 name: Testing HAProxy Load Balancing
 hosts: HAproxy
 become: yes
-  tasks:
+tasks:
     - name: Test HAProxy 1st time
       shell: curl localhost
       register: output1
