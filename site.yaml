@@ -4,60 +4,61 @@
   hosts: all
   gather_facts: yes
 
-- name: Configuring HAProxy
+- name: Configuring HAproxy
   hosts: HAproxy
   become: true
   become_method: sudo
   tasks:
-    - name: Install HAProxy
+    - name: Install HAproxy
       apt:
         name: haproxy
         update_cache: yes
         state: latest
 
-    - name: Configure HAProxy for load balancing
+    - name: Configure HAproxy for load balancing
       template:
         src: haproxy.cfg.j2
         dest: /etc/haproxy/haproxy.cfg
 
-    - name: Restart HAProxy service
+    - name: Restart HAproxy service
        service:
         name: haproxy   
         state: restarted
         
-- name: Web Server Configuration
+-  name: Web Server Configuration
   hosts: webservers
   become: yes
   become_method: sudo
   tasks:
-    - name: Update package cache
+    - name: Refresh apt cache
       apt:
         update_cache: yes
- - name: Install pip3
+      
+    - name: Ensure pip3 is installed
       apt:
         name: python3-pip
         state: latest
   
-    - name: Install Flask
+    - name: Install Flask framework
       pip:
         executable: pip3
         name: flask
         state: latest
         
-    - name: Install Gunicorn
+   - name: Install Gunicorn WSGI server
       pip:
         executable: pip3
-        name: gunicorn   
+        name: gunicorn
         state: latest
   
-    - name: Copy Flask application
+    - name: Deploy Flask application  
       copy:
         src: application2.py
         dest: /home/ubuntu/application2.py
         owner: ubuntu
         mode: '0644'
 
-    - name: Run Flask application with Gunicorn
+   - name: Start Flask app using Gunicorn
       shell: gunicorn -w 2 -D -b 0.0.0.0:5000 application2:app
       args:
         chdir: /home/ubuntu
@@ -66,17 +67,23 @@
   hosts: HAproxy
   become: yes
   tasks:
-    - name: Test HAProxy 1st time
+    - name: Test HAProxy - Round 1
       shell: curl localhost
-register: output1
-    - debug: var=output1.stdout
+      register: result1
+    - debug:
+        var: result1.stdout
       
-    - name: Test HAProxy 2nd time
+    - name: Test HAProxy - Round 2
       shell: curl localhost
-      register: output2
-    - debug: var=output2.stdout
+      register: result2
+    - debug:
+        var: result2.stdout
   
-    - name: Test HAProxy 3rd time
+    - name: Test HAProxy - Round 3
       shell: curl localhost
-      register: output3
-    - debug: var=output3.stdout
+      register: result3
+    - debug:
+        var: result3.stdout
+
+      
+  
