@@ -32,7 +32,7 @@
       apt:
         update_cache: yes
  - name: Install pip3
-      apt:
+   apt:
         name: python3-pip
         state: latest
   
@@ -58,7 +58,7 @@
     - name: Run Flask application with Gunicorn
       shell: gunicorn -w 2 -D -b 0.0.0.0:5000 application2:app
       args:
-        chdir: /home/ubuntu
+      chdir: /home/ubuntu
   
 - name: Testing HAProxy Load Balancing
   hosts: HAproxy
@@ -66,7 +66,7 @@
   tasks:
     - name: Test HAProxy 1st time
       shell: curl localhost
-register: output1
+      register: output1
     - debug: var=output1.stdout
       
     - name: Test HAProxy 2nd time
