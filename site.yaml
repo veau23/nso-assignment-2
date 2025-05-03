@@ -1,5 +1,5 @@
 - name: Common configuration for all hosts
-  hosts: all
+  hosts: HAproxy:webservers
   gather_facts: yes
 
 - name: Configuring HAProxy
