@@ -56,7 +56,7 @@
         owner: ubuntu
         mode: '0644'
     - name: Start Flask app using Gunicorn
-      shell: gunicorn -w 2 -D -b 0.0.0.0:5000 application2:app
+      shell: gunicorn -w 2 -D -b 0.0.0.0:8080 application2:app
       args:
         chdir: /home/ubuntu
 
