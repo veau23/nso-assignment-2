@@ -44,6 +44,6 @@ backend web_servers
     option forwardfor
 {% for instance in groups['webservers'] %}
 {% set ip_addr = hostvars[instance]['ansible_default_ipv4']['address'] %}
-    server {{ instance }} {{ ip_addr }}:5000 check
+    server {{ instance }} {{ ip_addr }}:80 check
 {% endfor %}
 
