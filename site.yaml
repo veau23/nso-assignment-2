@@ -1,84 +1,62 @@
-- name: Common configuration for all hosts
-  hosts: all
-  gather_facts: yes
-
-- name: Configuring HAProxy
-  hosts: HAproxy
+# haproxy configuration
+- hosts: all
+  gather_facts: true
+- hosts: HAproxy
   become: true
-  become_method: sudo
+
   tasks:
-    - name: Install HAProxy
+
+    - name: apt update
+      apt:
+        update_cache: yes
+
+    - name: Installing HAPROXY
       apt:
         name: haproxy
-        update_cache: yes
-        state: latest
+        state: present
 
-    - name: Configure HAProxy for load balancing
+    - name: Configure haproxy
       template:
-        src: haproxy.cfg.j2
+        src: /$PWD/haproxy.cfg.j2
         dest: /etc/haproxy/haproxy.cfg
-
-    - name: Restart HAProxy service
+ 
+    - name: Restart haproxy
       service:
         name: haproxy
         state: restarted
-
-- name: Web Server Configuration
-  hosts: webservers
-  become: yes
+        
+- hosts: webservers
+  become: true
   become_method: sudo
+  gather_facts: true
   tasks:
-    - name: Refresh apt cache
+    - name: apt update
       apt:
-        update_cache: yes
+        update_cache: true
 
-    - name: Ensure pip3 is installed
+    - name: Install Python3, pip3, and venv
       apt:
-        name: python3-pip
-        state: latest
-
-    - name: Install Flask framework
+        name:
+          - python3
+          - python3-pip
+          - python3-venv
+        state: present
+    - name: Installing flask
       pip:
         executable: pip3
         name: flask
         state: latest
 
-    - name: Install Gunicorn WSGI server
-      pip:
-        executable: pip3
+    - name: Installing Gunicorn
+      apt:
         name: gunicorn
-        state: latest
 
-    - name: Deploy Flask application
+    - name: Copy Application2.py
       copy:
-        src: application2.py
+        src: /$PWD/application2.py
         dest: /home/ubuntu/application2.py
         owner: ubuntu
         mode: '0644'
 
-    - name: Start Flask app using Gunicorn
-      shell: gunicorn -w 2 -D -b 0.0.0.0:5000 application2:app
-      args:
-        chdir: /home/ubuntu
-
-- name: Testing HAProxy Load Balancing
-  hosts: HAproxy
-  become: yes
-  tasks:
-    - name: Test HAProxy - Round 1
-      shell: curl localhost
-      register: result1
-    - debug:
-        var: result1.stdout
-        
-    - name: Test HAProxy - Round 2
-      shell: curl localhost
-      register: result2
-    - debug:
-        var: result2.stdout
-        
-    - name: Test HAProxy - Round 3
-      shell: curl localhost
-      register: result3
-    - debug:
-        var: result3.stdout
+    - name: Running Flask application
+      shell: gunicorn -w 2 -D -b 0.0.0.0:8080 application2:app
