@@ -1,5 +1,5 @@
 - name: Common configuration for all hosts
-  hosts: HAproxy:webservers
+  hosts: all
   gather_facts: yes
 
 - name: Configuring HAProxy
@@ -60,26 +60,4 @@
       args:
         chdir: /home/ubuntu
 
-- name: Testing HAProxy Load Balancing
-  hosts: HAproxy
-  become: yes
-  tasks:
-    - name: Test HAProxy - Round 1
-      shell: curl localhost
-      register: result1
-    - debug:
-        var: result1.stdout
-        
-    - name: Test HAProxy - Round 2
-      shell: curl localhost
-      register: result2
-    - debug:
-        var: result2.stdout
-        
-    - name: Test HAProxy - Round 3
-      shell: curl localhost
-      register: result3
-    - debug:
-        var: result3.stdout
-        
 
