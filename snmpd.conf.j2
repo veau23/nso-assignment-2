@@ -1,0 +1,43 @@
+###########################################################################
+#
+# snmpd_custom.conf
+# A customized configuration file for the Net-SNMP agent ('snmpd')
+# Based on snmpd.conf(5)
+#
+###########################################################################
+# SECTION: System Metadata
+#
+
+# System physical location (read-only when set here)
+sysLocation    Server Room B, Rack 4
+sysContact     Admin <admin@example.com>
+
+# SysServices bitmask value (Layer 3 + Layer 4 + Applications = 72)
+sysServices    72
+
+
+###########################################################################
+# SECTION: Agent Operation Mode
+#
+
+# Enable AgentX master functionality
+master  agentx
+
+# Define listening address and protocol
+agentAddress udp:161
+
+
+###########################################################################
+# SECTION: Access Control Policies
+#
+
+# SNMP View definitions
+view   limitedView  included   .1.3.6.1.2.1.1
+view   limitedView  included   .1.3.6.1.2.1.25.1
+
+# SNMPv1/v2c community (read-only) with view restriction
+rocommunity  readonly_access default -V limitedView
+rocommunity6 readonly_access default -V limitedView
+
+# SNMPv3 user access configuration
+rouser secureUser authpriv -V limitedView
